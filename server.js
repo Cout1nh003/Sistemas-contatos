@@ -440,3 +440,4 @@ initializeDatabase()
   });
 
 process.on('SIGINT', () => db.close(() => process.exit(0)));
+
