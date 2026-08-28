@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-const PUBLIC_DIR = fs.existsSync(path.join(__dirname, 'index.html')) ? __dirname : path.join(__dirname, 'public');
+const PUBLIC_DIR = path.join(__dirname, 'public');
 const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'));
 
 app.use(express.json({ limit: '100kb' }));
