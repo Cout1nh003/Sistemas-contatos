@@ -191,127 +191,112 @@ function validateQuoteV2(body) {
 }
 
 function initializeDatabase() {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      db.run(`CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
-      )`);
-      db.run(`CREATE TABLE IF NOT EXISTS contatos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        email TEXT NOT NULL,
-        telefone TEXT NOT NULL,
-        assunto TEXT NOT NULL,
-        mensagem TEXT NOT NULL,
-        newsletter INTEGER NOT NULL DEFAULT 0,
-        recebidoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )`, (error) => {
-        if (error) return reject(error);
-        db.run(`CREATE TABLE IF NOT EXISTS orcamentos (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          numero TEXT NOT NULL UNIQUE,
-          cliente TEXT NOT NULL,
-          telefone TEXT NOT NULL,
-          email TEXT,
-          produto TEXT NOT NULL,
-          largura REAL NOT NULL,
-          altura REAL NOT NULL,
-          area REAL NOT NULL,
-          areaTotal REAL NOT NULL,
-          quantidade INTEGER NOT NULL,
-          tipoVidro TEXT NOT NULL,
-          espessura TEXT NOT NULL,
-          acabamento TEXT,
-          acessorios TEXT,
-          precoVidroM2 REAL NOT NULL,
-          valorVidro REAL NOT NULL,
-          valorFerragens REAL NOT NULL,
-          valorInstalacao REAL NOT NULL,
-          subtotal REAL NOT NULL,
-          desconto REAL NOT NULL DEFAULT 0,
-          valorFinal REAL NOT NULL,
-          observacoes TEXT,
-          status TEXT NOT NULL DEFAULT 'Rascunho',
-          criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )`, (quoteTableError) => {
-          if (quoteTableError) return reject(quoteTableError);
-          db.run(`CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            documento TEXT,
-            telefone TEXT,
-            whatsapp TEXT,
-            email TEXT,
-            endereco TEXT,
-            numero TEXT,
-            complemento TEXT,
-            bairro TEXT,
-            cidade TEXT,
-            estado TEXT,
-            cep TEXT,
-            criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-          )`);
-          db.run(`CREATE TABLE IF NOT EXISTS categorias (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL UNIQUE,
-            ativo INTEGER NOT NULL DEFAULT 1
-          )`);
-          db.run(`CREATE TABLE IF NOT EXISTS produtos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            categoria TEXT NOT NULL,
-            subcategoria TEXT,
-            referencia TEXT,
-            unidade TEXT NOT NULL DEFAULT 'UN',
-            preco REAL NOT NULL DEFAULT 0,
-            ativo INTEGER NOT NULL DEFAULT 1,
-            observacao TEXT,
-            criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-          )`);
-          db.run(`CREATE TABLE IF NOT EXISTS orcamento_itens (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            orcamentoId INTEGER NOT NULL,
-            produtoId INTEGER,
-            descricao TEXT NOT NULL,
-            categoria TEXT,
-            unidade TEXT NOT NULL,
-            quantidade REAL NOT NULL,
-            largura REAL NOT NULL DEFAULT 0,
-            altura REAL NOT NULL DEFAULT 0,
-            area REAL NOT NULL DEFAULT 0,
-            valorUnitario REAL NOT NULL DEFAULT 0,
-            subtotal REAL NOT NULL DEFAULT 0,
-            FOREIGN KEY (orcamentoId) REFERENCES orcamentos(id),
-            FOREIGN KEY (produtoId) REFERENCES produtos(id)
-          )`);
-          db.run(`CREATE TABLE IF NOT EXISTS configuracoes_empresa (
-            id INTEGER PRIMARY KEY CHECK (id = 1),
-            razaoSocial TEXT, nomeFantasia TEXT, cnpj TEXT, telefone TEXT, whatsapp TEXT,
-            email TEXT, endereco TEXT, cep TEXT, cidade TEXT, estado TEXT, logo TEXT
-          )`);
-          db.run('INSERT OR IGNORE INTO configuracoes_empresa (id, nomeFantasia) VALUES (1, ?)', ['OrçaFlow']);
-          db.serialize(async () => {
-            try { await ensureQuoteColumns(); await seedCatalog(); } catch (setupError) { return reject(setupError); }
-          });
-          db.get('SELECT id FROM usuarios WHERE username = ?', [ADMIN_USERNAME], async (findError, user) => {
-          if (findError) return reject(findError);
-          if (user) return resolve();
-          try {
-            const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
-            db.run('INSERT INTO usuarios (username, password) VALUES (?, ?)', [ADMIN_USERNAME, passwordHash], (insertError) => {
-              if (insertError) return reject(insertError);
-              resolve();
-            });
-          } catch (hashError) {
-            reject(hashError);
-          }
-          });
-        });
-      });
-    });
-  });
+  return (async () => {
+    await runQuery(`CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS contatos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      email TEXT NOT NULL,
+      telefone TEXT NOT NULL,
+      assunto TEXT NOT NULL,
+      mensagem TEXT NOT NULL,
+      newsletter INTEGER NOT NULL DEFAULT 0,
+      recebidoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS orcamentos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      numero TEXT NOT NULL UNIQUE,
+      cliente TEXT NOT NULL,
+      telefone TEXT NOT NULL,
+      email TEXT,
+      produto TEXT NOT NULL,
+      largura REAL NOT NULL,
+      altura REAL NOT NULL,
+      area REAL NOT NULL,
+      areaTotal REAL NOT NULL,
+      quantidade INTEGER NOT NULL,
+      tipoVidro TEXT NOT NULL,
+      espessura TEXT NOT NULL,
+      acabamento TEXT,
+      acessorios TEXT,
+      precoVidroM2 REAL NOT NULL,
+      valorVidro REAL NOT NULL,
+      valorFerragens REAL NOT NULL,
+      valorInstalacao REAL NOT NULL,
+      subtotal REAL NOT NULL,
+      desconto REAL NOT NULL DEFAULT 0,
+      valorFinal REAL NOT NULL,
+      observacoes TEXT,
+      status TEXT NOT NULL DEFAULT 'Rascunho',
+      criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS clientes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      documento TEXT,
+      telefone TEXT,
+      whatsapp TEXT,
+      email TEXT,
+      endereco TEXT,
+      numero TEXT,
+      complemento TEXT,
+      bairro TEXT,
+      cidade TEXT,
+      estado TEXT,
+      cep TEXT,
+      criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS categorias (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL UNIQUE,
+      ativo INTEGER NOT NULL DEFAULT 1
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS produtos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      categoria TEXT NOT NULL,
+      subcategoria TEXT,
+      referencia TEXT,
+      unidade TEXT NOT NULL DEFAULT 'UN',
+      preco REAL NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      observacao TEXT,
+      criadoEm TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS orcamento_itens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      orcamentoId INTEGER NOT NULL,
+      produtoId INTEGER,
+      descricao TEXT NOT NULL,
+      categoria TEXT,
+      unidade TEXT NOT NULL,
+      quantidade REAL NOT NULL,
+      largura REAL NOT NULL DEFAULT 0,
+      altura REAL NOT NULL DEFAULT 0,
+      area REAL NOT NULL DEFAULT 0,
+      valorUnitario REAL NOT NULL DEFAULT 0,
+      subtotal REAL NOT NULL DEFAULT 0,
+      FOREIGN KEY (orcamentoId) REFERENCES orcamentos(id),
+      FOREIGN KEY (produtoId) REFERENCES produtos(id)
+    )`);
+    await runQuery(`CREATE TABLE IF NOT EXISTS configuracoes_empresa (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      razaoSocial TEXT, nomeFantasia TEXT, cnpj TEXT, telefone TEXT, whatsapp TEXT,
+      email TEXT, endereco TEXT, cep TEXT, cidade TEXT, estado TEXT, logo TEXT
+    )`);
+    await runQuery('INSERT OR IGNORE INTO configuracoes_empresa (id, nomeFantasia) VALUES (1, ?)', ['OrçaFlow']);
+    await ensureQuoteColumns();
+    await seedCatalog();
+    const user = await getQuery('SELECT id FROM usuarios WHERE username = ?', [ADMIN_USERNAME]);
+    if (!user) {
+      const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+      await runQuery('INSERT INTO usuarios (username, password) VALUES (?, ?)', [ADMIN_USERNAME, passwordHash]);
+    }
+  })();
 }
 
 app.get('/login.html', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'login.html')));
