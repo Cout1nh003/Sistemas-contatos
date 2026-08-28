@@ -9,11 +9,10 @@ const [error, setError] = useState('');
 
 async function handleSubmit(event) {
 event.preventDefault();
-
-```
 setError('');
 setLoading(true);
 
+```
 try {
   await login(username, password);
 
@@ -73,4 +72,3 @@ return ( <main className="login-page"> <div className="login-card"> <div classNa
 
 );
 }
-
