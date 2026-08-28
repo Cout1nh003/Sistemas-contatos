@@ -1,5 +1,7 @@
-import { Boxes, FileText, FolderTree, LayoutDashboard, LogOut, MessageSquare, Settings, Users, X } from 'lucide-react';
-import { logout } from '../services/api';
-
-const links = [['dashboard', 'Visão geral', LayoutDashboard], ['quotes', 'Orçamentos', FileText], ['clients', 'Clientes', Users], ['products', 'Produtos', Boxes], ['categories', 'Categorias', FolderTree], ['contacts', 'Contatos', MessageSquare], ['company', 'Empresa', Settings]];
-export default function Sidebar({ page, setPage, username, open, setOpen }) { const signOut = async () => { await logout(); window.location.href = '/login.html'; }; return <aside className={`sidebar ${open ? 'open' : ''}`}><div className="side-brand"><span className="brand-mark">OF</span><strong>OrçaFlow</strong><button className="icon-button mobile-only" onClick={() => setOpen(false)} aria-label="Fechar menu"><X size={19} /></button></div><nav>{links.map(([id, label, Icon]) => <button key={id} className={page === id ? 'active' : ''} onClick={() => { setPage(id); setOpen(false); }}><Icon size={18} />{label}</button>)}</nav><div className="side-foot"><div className="user-chip"><span className="avatar">{(username || 'A')[0].toUpperCase()}</span><span><b>{username || 'Admin'}</b><small>Administrador</small></span></div><button className="logout-link" onClick={signOut}><LogOut size={16} />Sair</button></div></aside>; }
+import { useState } from 'react';
+import Sidebar from './Sidebar';
+import Header from './Header';
+export default function Layout({ page, setPage, username, children }) {
+  const [open, setOpen] = useState(false);
+  return <div className="app-shell"><Sidebar page={page} setPage={setPage} username={username} open={open} setOpen={setOpen} /><div className="main-shell"><Header onMenu={() => setOpen(true)} /><main className="content">{children}</main></div></div>;
+}
