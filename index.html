@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel | OrçaFlow</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="app-page">
+  <header class="topbar"><a class="brand" href="/"><span class="brand-mark">OF</span><span>OrçaFlow</span></a><div class="user-menu"><span class="online-dot"></span><span id="current-user">Admin</span><button id="logout-button" class="button button-ghost" type="button">Sair <span aria-hidden="true">&#8594;</span></button></div></header>
+  <main class="dashboard">
+    <section class="page-heading"><div><p class="eyebrow">Visão geral</p><h1>Contatos e orçamentos</h1><p class="muted">Acompanhe as novas solicitações da sua operação.</p></div><div class="heading-date" id="today-label"></div></section>
+    <div id="app-message" class="feedback" role="status" aria-live="polite"></div>
+    <section class="metrics"><article class="metric-card accent"><div class="metric-icon">&#9733;</div><div><span class="metric-label">Total de contatos</span><strong id="contact-count">0</strong><small>registros recebidos</small></div></article><article class="metric-card"><div class="metric-icon neutral">&#9719;</div><div><span class="metric-label">Última atualização</span><strong id="last-update">--:--</strong><small>dados sincronizados</small></div></article></section>
+    <section class="workspace-grid">
+      <article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">Novo registro</p><h2 id="form-title">Adicionar contato</h2></div><button id="cancel-edit" class="icon-button hidden" type="button" title="Cancelar edição" aria-label="Cancelar edição">&#10005;</button></div>
+        <form id="contact-form" novalidate><input type="hidden" id="contact-id">
+          <div class="form-grid"><div class="field"><label for="nome">Nome</label><input id="nome" name="nome" required maxlength="120" placeholder="Nome completo"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required maxlength="160" placeholder="nome@empresa.com"></div><div class="field"><label for="telefone">Telefone</label><input id="telefone" name="telefone" required maxlength="30" placeholder="(00) 00000-0000"></div><div class="field"><label for="assunto">Assunto</label><input id="assunto" name="assunto" required maxlength="160" placeholder="Tipo de orçamento"></div><div class="field field-wide"><label for="mensagem">Mensagem</label><textarea id="mensagem" name="mensagem" required maxlength="3000" rows="4" placeholder="Descreva a solicitação..."></textarea></div></div>
+          <label class="check-row"><input id="newsletter" name="newsletter" type="checkbox"><span class="custom-check"></span><span>Aceita receber novidades por email</span></label>
+          <button id="submit-button" class="button button-primary button-full" type="submit">Enviar contato <span aria-hidden="true">&#8594;</span></button>
+        </form>
+      </article>
+      <article class="panel contacts-panel"><div class="panel-heading contacts-heading"><div><p class="eyebrow">Base de dados</p><h2>Solicitações recentes</h2></div><span class="record-badge" id="record-badge">0 registros</span></div><div class="toolbar"><div class="search-box"><span aria-hidden="true">&#9906;</span><input id="search-input" type="search" placeholder="Buscar por nome..." aria-label="Buscar por nome"></div><select id="sort-select" aria-label="Ordenar contatos"><option value="id-desc">Mais recentes</option><option value="id-asc">ID crescente</option><option value="name-asc">Nome A-Z</option><option value="name-desc">Nome Z-A</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Contato</th><th>Telefone</th><th>Assunto</th><th>Mensagem</th><th>News.</th><th>Data</th><th>Ações</th></tr></thead><tbody id="contacts-body"></tbody></table><div id="empty-state" class="empty-state hidden"><span>&#9719;</span><strong>Nenhum contato encontrado</strong><p>Ajuste a busca ou adicione um novo registro.</p></div></div></article>
+    </section>
+  </main>
+  <script src="/script.js"></script>
+</body>
+</html>
