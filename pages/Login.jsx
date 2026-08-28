@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { ArrowRight, LockKeyhole, UserRound } from 'lucide-react';
-import { login } from '../services/api';
-import { Button } from '../components/common';
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import Login from './pages/Login';
+import './styles.css';
 
-export default function Login() {
-  const [form, setForm] = useState({ username: '', password: '' }); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
-  const submit = async (event) => { event.preventDefault(); if (!form.username || !form.password) return setError('Informe usuário e senha.'); setBusy(true); setError(''); try { await login(form); window.location.href = '/'; } catch (err) { setError(err.message); setBusy(false); } };
-  return <main className="login-page"><section className="login-visual"><div className="brand-lockup"><span className="brand-mark">OF</span><b>OrçaFlow</b></div><span className="eyebrow">Gestão comercial</span><h1>Clareza para cada oportunidade.</h1><p>Uma operação mais organizada começa quando seus dados trabalham juntos.</p><div className="visual-note"><span>01</span><span>Organizado</span><span>02</span><span>Seguro</span></div></section><section className="login-card"><span className="eyebrow">Acesso administrativo</span><h2>Bem-vindo de volta</h2><p className="muted">Entre para acessar seu painel.</p>{error && <div className="feedback error">{error}</div>}<form onSubmit={submit}><label className="field"><span>Usuário</span><div className="input-icon"><UserRound size={17} /><input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} autoComplete="username" required /></div></label><label className="field"><span>Senha</span><div className="input-icon"><LockKeyhole size={17} /><input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="current-password" required /></div></label><Button type="submit" disabled={busy}>{busy ? 'Entrando...' : 'Entrar no painel'} <ArrowRight size={16} /></Button></form></section></main>;
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <Login />
+  </React.StrictMode>
+);
+```
