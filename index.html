@@ -12,6 +12,34 @@
     <section class="page-heading"><div><p class="eyebrow">Visão geral</p><h1>Contatos e orçamentos</h1><p class="muted">Acompanhe as novas solicitações da sua operação.</p></div><div class="heading-date" id="today-label"></div></section>
     <div id="app-message" class="feedback" role="status" aria-live="polite"></div>
     <section class="metrics"><article class="metric-card accent"><div class="metric-icon">&#9733;</div><div><span class="metric-label">Total de contatos</span><strong id="contact-count">0</strong><small>registros recebidos</small></div></article><article class="metric-card"><div class="metric-icon neutral">&#9719;</div><div><span class="metric-label">Última atualização</span><strong id="last-update">--:--</strong><small>dados sincronizados</small></div></article></section>
+    <section class="quote-section">
+      <article class="panel quote-form-panel"><div class="panel-heading"><div><p class="eyebrow">Novo orçamento</p><h2 id="quote-form-title">Criar orçamento</h2></div><button id="cancel-quote-edit" class="icon-button hidden" type="button" title="Cancelar edição" aria-label="Cancelar edição">&#10005;</button></div>
+        <form id="quote-form" novalidate><input type="hidden" id="quote-id">
+          <div class="quote-grid">
+            <div class="field"><label for="quote-cliente">Cliente</label><input id="quote-cliente" name="cliente" required maxlength="120" placeholder="Nome completo"></div>
+            <div class="field"><label for="quote-telefone">Telefone</label><input id="quote-telefone" name="telefone" required maxlength="30" placeholder="(00) 00000-0000"></div>
+            <div class="field"><label for="quote-email">Email</label><input id="quote-email" name="email" type="email" maxlength="160" placeholder="cliente@email.com"></div>
+            <div class="field"><label for="quote-produto">Produto/serviço</label><input id="quote-produto" name="produto" required maxlength="160" placeholder="Box, janela, espelho..."></div>
+            <div class="field"><label for="quote-largura">Largura (m)</label><input id="quote-largura" name="largura" type="number" min="0.01" step="0.01" required></div>
+            <div class="field"><label for="quote-altura">Altura (m)</label><input id="quote-altura" name="altura" type="number" min="0.01" step="0.01" required></div>
+            <div class="field"><label for="quote-quantidade">Quantidade</label><input id="quote-quantidade" name="quantidade" type="number" min="1" step="1" value="1" required></div>
+            <div class="field"><label for="quote-tipo-vidro">Tipo de vidro</label><input id="quote-tipo-vidro" name="tipoVidro" required maxlength="100" placeholder="Temperado, laminado..."></div>
+            <div class="field"><label for="quote-espessura">Espessura</label><input id="quote-espessura" name="espessura" required maxlength="50" placeholder="8 mm"></div>
+            <div class="field"><label for="quote-acabamento">Cor/acabamento</label><input id="quote-acabamento" name="acabamento" maxlength="120" placeholder="Incolor, fumê, branco..."></div>
+            <div class="field field-wide"><label for="quote-acessorios">Ferragens/acessórios</label><input id="quote-acessorios" name="acessorios" maxlength="1000" placeholder="Descreva ferragens e acessórios"></div>
+            <div class="field"><label for="quote-preco-vidro">Preço do vidro (m²)</label><input id="quote-preco-vidro" name="precoVidroM2" type="number" min="0" step="0.01" value="0" required></div>
+            <div class="field"><label for="quote-ferragens">Valor das ferragens</label><input id="quote-ferragens" name="valorFerragens" type="number" min="0" step="0.01" value="0" required></div>
+            <div class="field"><label for="quote-instalacao">Valor da instalação</label><input id="quote-instalacao" name="valorInstalacao" type="number" min="0" step="0.01" value="0" required></div>
+            <div class="field"><label for="quote-desconto">Desconto</label><input id="quote-desconto" name="desconto" type="number" min="0" step="0.01" value="0" required></div>
+            <div class="field"><label for="quote-status">Status</label><select id="quote-status" name="status"><option>Rascunho</option><option>Enviado</option><option>Aprovado</option><option>Recusado</option></select></div>
+            <div class="field field-wide"><label for="quote-observacoes">Observações</label><textarea id="quote-observacoes" name="observacoes" maxlength="3000" rows="3" placeholder="Detalhes e condições do orçamento..."></textarea></div>
+          </div>
+          <div class="quote-total-grid"><div><span>Área total</span><strong id="quote-area-total">0,00 m²</strong></div><div><span>Valor do vidro</span><strong id="quote-valor-vidro">R$ 0,00</strong></div><div><span>Subtotal</span><strong id="quote-subtotal">R$ 0,00</strong></div><div class="quote-final"><span>Valor final</span><strong id="quote-valor-final">R$ 0,00</strong></div></div>
+          <button id="quote-submit-button" class="button button-primary button-full" type="submit">Salvar orçamento <span aria-hidden="true">&#8594;</span></button>
+        </form>
+      </article>
+      <article class="panel quotes-panel"><div class="panel-heading contacts-heading"><div><p class="eyebrow">Gestão comercial</p><h2>Orçamentos</h2></div><span class="record-badge" id="quote-record-badge">0 registros</span></div><div class="toolbar"><div class="search-box"><span aria-hidden="true">&#9906;</span><input id="quote-search-input" type="search" placeholder="Buscar por número, cliente..." aria-label="Buscar orçamentos"></div><select id="quote-status-filter" aria-label="Filtrar por status"><option value="">Todos os status</option><option>Rascunho</option><option>Enviado</option><option>Aprovado</option><option>Recusado</option></select></div><div class="table-wrap"><table><thead><tr><th>Número</th><th>Cliente</th><th>Produto</th><th>Área</th><th>Valor final</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead><tbody id="quotes-body"></tbody></table><div id="quotes-empty-state" class="empty-state hidden"><span>&#9719;</span><strong>Nenhum orçamento encontrado</strong><p>Cadastre um orçamento ou ajuste os filtros.</p></div></div></article>
+    </section>
     <section class="workspace-grid">
       <article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">Novo registro</p><h2 id="form-title">Adicionar contato</h2></div><button id="cancel-edit" class="icon-button hidden" type="button" title="Cancelar edição" aria-label="Cancelar edição">&#10005;</button></div>
         <form id="contact-form" novalidate><input type="hidden" id="contact-id">
