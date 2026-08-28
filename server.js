@@ -45,7 +45,6 @@ function validateContact(body) {
     email: String(body.email || '').trim(),
     telefone: String(body.telefone || '').trim(),
     assunto: String(body.assunto || '').trim(),
-    mensagem: String(body.mensagem || '').trim(),
     newsletter: body.newsletter ? 1 : 0
   };
   if (!contact.nome || contact.nome.length > 120) return { error: 'Informe um nome válido.' };
@@ -120,36 +119,27 @@ function allQuery(sql, params = []) {
   return new Promise((resolve, reject) => db.all(sql, params, (error, rows) => error ? reject(error) : resolve(rows)));
 }
 
+const PRODUCT_UNITS = ['UN', 'M²', 'KG', 'KIT', 'METRO', 'SERVIÇO'];
+
 const PRODUCT_SEEDS = [
-  ['Vidros', 'Vidro temperado', 'Vidro temperado', 'M²', 180],
-  ['Vidros', 'Vidro comum/float', 'Vidro comum/float', 'M²', 95],
-  ['Vidros', 'Vidro laminado', 'Vidro laminado', 'M²', 240],
-  ['Vidros', 'Vidro refletivo', 'Vidro refletivo', 'M²', 260],
-  ['Vidros', 'Vidro serigrafado', 'Vidro serigrafado', 'M²', 230],
-  ['Vidros', 'Espelho', 'Espelho', 'M²', 150],
-  ['Esquadrias', 'Janela de correr', 'Linha 25', 'M²', 680],
-  ['Esquadrias', 'Janela de abrir', 'Linha 30', 'M²', 760],
-  ['Esquadrias', 'Porta de correr', 'Linha Suprema', 'M²', 980],
-  ['Esquadrias', 'Porta pivotante', 'Linha Gold', 'M²', 1250],
-  ['Ferragens', 'Roldana simples', 'Roldanas e rodízios', 'UN', 18],
-  ['Ferragens', 'Roldana dupla', 'Roldanas e rodízios', 'UN', 32],
-  ['Ferragens', 'Fecho concha', 'Fechos e fechaduras', 'UN', 26],
-  ['Ferragens', 'Fechadura', 'Fechos e fechaduras', 'UN', 95],
-  ['Ferragens', 'Puxador tubular', 'Puxadores', 'UN', 75],
-  ['Ferragens', 'Dobradiça para vidro', 'Dobradiças', 'UN', 48],
-  ['Ferragens', 'Borracha de vedação', 'Vedação', 'M', 12],
-  ['Ferragens', 'Perfil de alumínio', 'Perfis e componentes', 'M', 42],
-  ['Ferragens', 'Silicone', 'Outros', 'UN', 28]
+  ['Vidros', 'Vidro temperado 6 mm', 'Temperado', 'M²', 180], ['Vidros', 'Vidro temperado 8 mm', 'Temperado', 'M²', 210], ['Vidros', 'Vidro temperado 10 mm', 'Temperado', 'M²', 260], ['Vidros', 'Vidro laminado', 'Laminado', 'M²', 240], ['Vidros', 'Vidro comum', 'Float', 'M²', 95], ['Vidros', 'Vidro fumê', 'Colorido', 'M²', 150], ['Vidros', 'Vidro verde', 'Colorido', 'M²', 150], ['Vidros', 'Vidro incolor', 'Float', 'M²', 120],
+  ['Espelhos', 'Espelho comum', 'Espelhos', 'M²', 150], ['Espelhos', 'Espelho lapidado', 'Espelhos', 'M²', 185], ['Espelhos', 'Espelho bisotado', 'Espelhos', 'M²', 230],
+  ['Esquadrias', 'Janela de correr', 'Linha 25', 'M²', 680], ['Esquadrias', 'Janela basculante', 'Linha 30', 'M²', 720], ['Esquadrias', 'Janela maxim-ar', 'Linha Suprema', 'M²', 780], ['Esquadrias', 'Janela com veneziana', 'Linha Gold', 'M²', 850],
+  ['Portas', 'Porta de correr', 'Linha Suprema', 'M²', 980], ['Portas', 'Porta de giro', 'Linha Gold', 'M²', 1050], ['Portas', 'Porta de duas folhas', 'Linha Master', 'M²', 1250],
+  ['Box', 'Box de correr', 'Box', 'M²', 780], ['Box', 'Box de abrir', 'Box', 'M²', 850], ['Box', 'Box frontal', 'Box', 'M²', 820], ['Box', 'Box de canto', 'Box', 'M²', 920],
+  ['Ferragens', 'Dobradiça', 'Dobradiças', 'UN', 48], ['Ferragens', 'Puxador', 'Puxadores', 'UN', 75], ['Ferragens', 'Fechadura', 'Fechos', 'UN', 95], ['Ferragens', 'Roldana', 'Roldanas', 'UN', 22], ['Ferragens', 'Trilho', 'Componentes', 'M', 42], ['Ferragens', 'Suporte', 'Componentes', 'UN', 28], ['Ferragens', 'Cantoneira', 'Componentes', 'UN', 18], ['Ferragens', 'Kit para box', 'Kits', 'KIT', 145],
+  ['Perfis', 'Perfil de alumínio', 'Perfis', 'M', 42], ['Perfis', 'Perfil para box', 'Perfis', 'M', 38], ['Perfis', 'Perfil para janela', 'Perfis', 'M', 52], ['Perfis', 'Perfil para porta', 'Perfis', 'M', 68],
+  ['Acessórios', 'Silicone', 'Vedação', 'UN', 28], ['Acessórios', 'Borracha de vedação', 'Vedação', 'M', 12], ['Acessórios', 'Escova de vedação', 'Vedação', 'M', 15], ['Acessórios', 'Fecho', 'Fechos', 'UN', 26], ['Acessórios', 'Limitador', 'Componentes', 'UN', 12], ['Acessórios', 'Kit de instalação', 'Kits', 'KIT', 65],
+  ['Serviços', 'Instalação', 'Mão de obra', 'SERVIÇO', 180], ['Serviços', 'Medição técnica', 'Serviços', 'SERVIÇO', 80], ['Outros', 'Serviço personalizado', 'Outros', 'SERVIÇO', 0]
 ];
 
 async function seedCatalog() {
   await runQuery(`CREATE TRIGGER IF NOT EXISTS categorias_nome_produtos AFTER UPDATE OF nome ON categorias BEGIN UPDATE produtos SET categoria = NEW.nome WHERE categoria = OLD.nome; END`);
-  const categories = [...new Set(PRODUCT_SEEDS.map((item) => item[0]))];
+  const categories = ['Vidros', 'Espelhos', 'Esquadrias', 'Portas', 'Janelas', 'Box', 'Ferragens', 'Perfis', 'Acessórios', 'Serviços', 'Outros'];
   for (const category of categories) await runQuery('INSERT OR IGNORE INTO categorias (nome, ativo) VALUES (?, 1)', [category]);
-  const count = await getQuery('SELECT COUNT(*) AS total FROM produtos');
-  if (count.total) return;
   for (const [category, name, subcategory, unit, price] of PRODUCT_SEEDS) {
-    await runQuery('INSERT INTO produtos (nome, categoria, subcategoria, referencia, unidade, preco, ativo, observacao) VALUES (?, ?, ?, ?, ?, ?, 1, ?)', [name, category, subcategory, `DEMO-${name.toUpperCase().replace(/[^A-Z0-9]+/g, '-').slice(0, 24)}`, unit, price, 'Preço demonstrativo configurável.']);
+    const existing = await getQuery('SELECT id FROM produtos WHERE nome = ? AND categoria = ?', [name, category]);
+    if (!existing) await runQuery('INSERT INTO produtos (nome, categoria, subcategoria, referencia, unidade, preco, ativo, observacao) VALUES (?, ?, ?, ?, ?, ?, 1, ?)', [name, category, subcategory, `DEMO-${name.toUpperCase().replace(/[^A-Z0-9]+/g, '-').slice(0, 24)}`, unit, price, 'Preço demonstrativo configurável.']);
   }
 }
 
@@ -377,8 +367,8 @@ app.delete('/api/contato/:id', requireAuth, (req, res) => {
 
 app.get('/api/produtos', requireAuth, async (req, res) => { try { const search = `%${String(req.query.search || '').trim()}%`; const rows = await allQuery(`SELECT * FROM produtos WHERE ativo = 1 AND (nome LIKE ? OR categoria LIKE ? OR referencia LIKE ?) ORDER BY categoria, nome`, [search, search, search]); res.json(rows); } catch (error) { sendError(res, 500, 'Não foi possível carregar os produtos.'); } });
 app.get('/api/admin/produtos', requireAuth, async (req, res) => { try { const rows = await allQuery('SELECT * FROM produtos ORDER BY categoria, nome'); res.json(rows); } catch (error) { sendError(res, 500, 'Não foi possível carregar o catálogo.'); } });
-app.post('/api/produtos', requireAuth, async (req, res) => { const product = [String(req.body.nome || '').trim(), String(req.body.categoria || '').trim(), String(req.body.subcategoria || '').trim(), String(req.body.referencia || '').trim(), ['UN', 'M', 'M²', 'KG', 'KIT'].includes(req.body.unidade) ? req.body.unidade : 'UN', numberValue(req.body.preco), req.body.ativo === false ? 0 : 1, String(req.body.observacao || '').trim()]; if (!product[0] || !product[1] || !Number.isFinite(product[5]) || product[5] < 0) return sendError(res, 400, 'Preencha os dados do produto.'); try { const result = await runQuery('INSERT INTO produtos (nome, categoria, subcategoria, referencia, unidade, preco, ativo, observacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', product); res.status(201).json({ message: 'Produto cadastrado com sucesso.', produto: { id: result.lastID } }); } catch (error) { sendError(res, 500, 'Não foi possível cadastrar o produto.'); } });
-app.put('/api/produtos/:id', requireAuth, async (req, res) => { const id = Number.parseInt(req.params.id, 10); const product = [String(req.body.nome || '').trim(), String(req.body.categoria || '').trim(), String(req.body.subcategoria || '').trim(), String(req.body.referencia || '').trim(), ['UN', 'M', 'M²', 'KG', 'KIT'].includes(req.body.unidade) ? req.body.unidade : 'UN', numberValue(req.body.preco), req.body.ativo === false ? 0 : 1, String(req.body.observacao || '').trim(), id]; if (!Number.isInteger(id) || !product[0] || !product[1] || !Number.isFinite(product[5]) || product[5] < 0) return sendError(res, 400, 'Preencha os dados do produto.'); try { const result = await runQuery('UPDATE produtos SET nome = ?, categoria = ?, subcategoria = ?, referencia = ?, unidade = ?, preco = ?, ativo = ?, observacao = ? WHERE id = ?', product); if (!result.changes) return sendError(res, 404, 'Produto não encontrado.'); res.json({ message: 'Produto atualizado com sucesso.' }); } catch (error) { sendError(res, 500, 'Não foi possível atualizar o produto.'); } });
+app.post('/api/produtos', requireAuth, async (req, res) => { const product = [String(req.body.nome || '').trim(), String(req.body.categoria || '').trim(), String(req.body.subcategoria || '').trim(), String(req.body.referencia || '').trim(), PRODUCT_UNITS.includes(req.body.unidade) ? req.body.unidade : 'UN', numberValue(req.body.preco), req.body.ativo === false ? 0 : 1, String(req.body.observacao || '').trim()]; if (!product[0] || !product[1] || !Number.isFinite(product[5]) || product[5] < 0) return sendError(res, 400, 'Preencha os dados do produto.'); try { const result = await runQuery('INSERT INTO produtos (nome, categoria, subcategoria, referencia, unidade, preco, ativo, observacao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', product); res.status(201).json({ message: 'Produto cadastrado com sucesso.', produto: { id: result.lastID } }); } catch (error) { sendError(res, 500, 'Não foi possível cadastrar o produto.'); } });
+app.put('/api/produtos/:id', requireAuth, async (req, res) => { const id = Number.parseInt(req.params.id, 10); const product = [String(req.body.nome || '').trim(), String(req.body.categoria || '').trim(), String(req.body.subcategoria || '').trim(), String(req.body.referencia || '').trim(), PRODUCT_UNITS.includes(req.body.unidade) ? req.body.unidade : 'UN', numberValue(req.body.preco), req.body.ativo === false ? 0 : 1, String(req.body.observacao || '').trim(), id]; if (!Number.isInteger(id) || !product[0] || !product[1] || !Number.isFinite(product[5]) || product[5] < 0) return sendError(res, 400, 'Preencha os dados do produto.'); try { const result = await runQuery('UPDATE produtos SET nome = ?, categoria = ?, subcategoria = ?, referencia = ?, unidade = ?, preco = ?, ativo = ?, observacao = ? WHERE id = ?', product); if (!result.changes) return sendError(res, 404, 'Produto não encontrado.'); res.json({ message: 'Produto atualizado com sucesso.' }); } catch (error) { sendError(res, 500, 'Não foi possível atualizar o produto.'); } });
 app.delete('/api/produtos/:id', requireAuth, async (req, res) => { const id = Number.parseInt(req.params.id, 10); if (!Number.isInteger(id)) return sendError(res, 400, 'Produto inválido.'); try { const used = await getQuery('SELECT COUNT(*) AS total FROM orcamento_itens WHERE produtoId = ?', [id]); if (used.total) return sendError(res, 409, 'Produto usado em orçamento; desative-o em vez de excluir.'); const result = await runQuery('DELETE FROM produtos WHERE id = ?', [id]); if (!result.changes) return sendError(res, 404, 'Produto não encontrado.'); res.json({ message: 'Produto excluído com sucesso.' }); } catch (error) { sendError(res, 500, 'Não foi possível excluir o produto.'); } });
 app.get('/api/clientes', requireAuth, async (req, res) => { try { const search = `%${String(req.query.search || '').trim()}%`; res.json(await allQuery('SELECT * FROM clientes WHERE nome LIKE ? OR documento LIKE ? OR telefone LIKE ? ORDER BY nome', [search, search, search])); } catch (error) { sendError(res, 500, 'Não foi possível carregar os clientes.'); } });
 app.post('/api/clientes', requireAuth, async (req, res) => { const values = ['nome', 'documento', 'telefone', 'whatsapp', 'email', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'cep'].map((key) => String(req.body[key] || '').trim()); if (!values[0]) return sendError(res, 400, 'Informe o nome do cliente.'); try { const result = await runQuery('INSERT INTO clientes (nome, documento, telefone, whatsapp, email, endereco, numero, complemento, bairro, cidade, estado, cep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', values); res.status(201).json({ message: 'Cliente cadastrado com sucesso.', cliente: { id: result.lastID, nome: values[0] } }); } catch (error) { sendError(res, 500, 'Não foi possível cadastrar o cliente.'); } });
@@ -448,5 +438,6 @@ initializeDatabase()
   });
 
 process.on('SIGINT', () => db.close(() => process.exit(0)));
+
 
 
