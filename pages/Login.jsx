@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { login } from '../services/api';
+import React, { useState } from "react";
+import { login } from "../services/api";
 
 export default function Login({ onLogin }) {
-const [username, setUsername] = useState('');
-const [password, setPassword] = useState('');
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
 const [loading, setLoading] = useState(false);
-const [error, setError] = useState('');
+const [error, setError] = useState("");
 
 async function handleSubmit(event) {
 event.preventDefault();
-setError('');
-setLoading(true);
 
 ```
+setError("");
+setLoading(true);
+
 try {
   await login(username, password);
 
@@ -20,7 +21,7 @@ try {
     onLogin();
   }
 } catch (err) {
-  setError(err.message || 'Usuário ou senha inválidos.');
+  setError(err?.message || "Usuário ou senha inválidos.");
 } finally {
   setLoading(false);
 }
@@ -34,6 +35,7 @@ return ( <main className="login-page"> <div className="login-card"> <div classNa
     <form onSubmit={handleSubmit}>
       <div className="field">
         <label htmlFor="username">Usuário</label>
+
         <input
           id="username"
           type="text"
@@ -46,6 +48,7 @@ return ( <main className="login-page"> <div className="login-card"> <div classNa
 
       <div className="field">
         <label htmlFor="password">Senha</label>
+
         <input
           id="password"
           type="password"
@@ -63,7 +66,7 @@ return ( <main className="login-page"> <div className="login-card"> <div classNa
       )}
 
       <button type="submit" disabled={loading}>
-        {loading ? 'Entrando...' : 'Entrar'}
+        {loading ? "Entrando..." : "Entrar"}
       </button>
     </form>
   </div>
