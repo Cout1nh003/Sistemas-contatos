@@ -1,4 +1,5 @@
 
+ {
   "name": "painel-orcamentos",
   "version": "1.0.0",
   "description": "Sistema administrativo de contatos com Express e SQLite",
